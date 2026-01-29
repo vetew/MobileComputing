@@ -3,10 +3,8 @@ package com.example.mobiecomputing
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,7 +17,6 @@ import androidx.compose.ui.res.painterResource
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -45,6 +42,21 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 
 
+//for hw2
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.Alignment
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
+
 
 
 class MainActivity : ComponentActivity() {
@@ -52,7 +64,33 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MobiecomputingTheme {
-                Conversation(SampleData.conversationSample)
+                val navController = rememberNavController()
+
+                NavHost(
+                    navController = navController,
+                    startDestination = Screen.Main.route
+                ) {
+                    composable(Screen.Main.route) {
+                        MessagesScreen(
+                            onGoToSecond = {
+                                navController.navigate(Screen.Second.route) {
+                                    launchSingleTop = true
+                                }
+                            }
+                        )
+                    }
+
+                    composable(Screen.Second.route) {
+                        SettingsScreen(
+                            onBackToMain = {
+                                navController.navigate(Screen.Main.route) {
+                                    popUpTo(Screen.Main.route) { inclusive = true }
+                                    launchSingleTop = true
+                                }
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -105,7 +143,67 @@ fun MessageCard(msg: Message) {
     }
 }
 
+sealed class Screen(val route: String) {
+    data object Main : Screen("messages")
+    data object Second : Screen("settings")
+}
 
+
+@Composable
+fun MessagesScreen(onGoToSecond: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+    ) {
+        IconButton(
+            onClick = onGoToSecond,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Settings,
+                contentDescription = "Settings"
+            )
+        }
+
+        Conversation(
+            messages = SampleData.conversationSample,
+            modifier = Modifier.padding(top = 48.dp)
+        )
+    }
+}
+@Composable
+fun SettingsScreen(onBackToMain: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+    ) {
+        IconButton(
+            onClick = onBackToMain,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "back"
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 48.dp, start = 16.dp, end = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text("Settings", style = MaterialTheme.typography.titleLarge)
+            Text("Hirviän monta asetusta täälä niin")
+        }
+    }
+}
 
 @Preview(name = "Light Mode")
 @Preview(
@@ -125,8 +223,11 @@ fun PreviewMessageCard() {
 }
 
 @Composable
-fun Conversation(messages: List<Message>) {
-    LazyColumn {
+fun Conversation(
+    messages: List<Message>,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(modifier = modifier) {
         items(messages) { message ->
             MessageCard(message)
         }
