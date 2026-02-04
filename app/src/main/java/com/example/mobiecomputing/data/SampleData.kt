@@ -1,7 +1,5 @@
 package com.example.mobiecomputing.data
 
-import com.example.mobiecomputing.Message
-
 /**
  * SampleData for Jetpack Compose Tutorial
  */
