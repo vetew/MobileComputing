@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -39,7 +40,7 @@ import androidx.compose.foundation.layout.Spacer
 
 
 @Composable
-fun MessagesScreen(onGoToSecond: () -> Unit) {
+fun MessagesScreen(onGoToSecond: () -> Unit, onGoToMonitor: () -> Unit) {
     val context = LocalContext.current
     val repository = remember { ProfileRepository(context) }
     var profileName by remember { mutableStateOf("Oletus käyttäjä") }
@@ -57,6 +58,14 @@ fun MessagesScreen(onGoToSecond: () -> Unit) {
             .fillMaxSize()
             .statusBarsPadding()
     ) {
+        Button(
+            onClick = onGoToMonitor,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(8.dp)
+        ) {
+            Text("Löyly")
+        }
         IconButton(
             onClick = onGoToSecond,
             modifier = Modifier
@@ -126,5 +135,5 @@ private fun ProfileHeader(name: String, imageUri: String?, modifier: Modifier = 
 @Preview
 @Composable
 fun MessagesScreenPreview() {
-    MessagesScreen(onGoToSecond = {})
+    MessagesScreen(onGoToSecond = {}, onGoToMonitor = {})
 }

@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.room.ktx)
     implementation(libs.room.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     ksp(libs.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
