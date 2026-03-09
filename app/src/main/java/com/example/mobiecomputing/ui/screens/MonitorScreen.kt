@@ -2,13 +2,17 @@ package com.example.mobiecomputing.ui.screens
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.widget.MediaController
+import android.widget.VideoView
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -24,8 +28,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mobiecomputing.R
 import com.example.mobiecomputing.ui.viewmodel.MonitorViewModel
 
 @Composable
@@ -62,6 +68,10 @@ fun MonitorScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text("Löyly Tunnistaja 3000", style = MaterialTheme.typography.headlineSmall)
+
+        VideoPlayerView(
+            videoUri = Uri.parse("android.resource://${context.packageName}/${R.raw.video}")
+        )
 
         if (!uiState.sensorAvailable) {
             Text("Debug: ei oo sensoria")
@@ -110,4 +120,25 @@ fun MonitorScreen(
             Text("Lopeta taustamittaus")
         }
     }
+}
+
+@Composable
+fun VideoPlayerView(videoUri: Uri) {
+    AndroidView(
+        factory = { context ->
+            VideoView(context).apply {
+                setVideoURI(videoUri)
+                val controller = MediaController(context)
+                controller.setAnchorView(this)
+                setMediaController(controller)
+                setOnPreparedListener { mp ->
+                    mp.isLooping = true
+                    start()
+                }
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+    )
 }
